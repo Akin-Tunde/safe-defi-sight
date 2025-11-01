@@ -4,14 +4,33 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FileCode, Shield, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
+import { useBlockchainData } from "@/hooks/useBlockchainData";
+import { toast } from "sonner";
 
 export default function ContractScanner() {
   const [address, setAddress] = useState("");
   const [scanning, setScanning] = useState(false);
+  const [hasScanned, setHasScanned] = useState(false);
+  const { scanContract } = useBlockchainData();
 
-  const handleScan = () => {
+  const handleScan = async () => {
+    if (!address || !/^0x[a-fA-F0-9]{40}$/.test(address)) {
+      toast.error("Please enter a valid contract address");
+      return;
+    }
+
     setScanning(true);
-    setTimeout(() => setScanning(false), 2000);
+    setHasScanned(false);
+
+    try {
+      await scanContract(address);
+      setHasScanned(true);
+      toast.success("Contract scan complete");
+    } catch (error) {
+      toast.error("Failed to scan contract. Please try again.");
+    } finally {
+      setScanning(false);
+    }
   };
 
   return (
@@ -54,7 +73,7 @@ export default function ContractScanner() {
         </div>
       )}
 
-      {!scanning && address && (
+      {!scanning && hasScanned && (
         <div className="space-y-6">
           <Card className="shadow-card bg-gradient-card border-border">
             <CardHeader>

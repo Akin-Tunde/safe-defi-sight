@@ -4,15 +4,33 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Search, AlertTriangle, CheckCircle, PieChart } from "lucide-react";
+import { useBlockchainData } from "@/hooks/useBlockchainData";
+import { toast } from "sonner";
 
 export default function TokenAnalyzer() {
   const [address, setAddress] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
+  const [hasAnalyzed, setHasAnalyzed] = useState(false);
+  const { analyzeToken } = useBlockchainData();
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
+    if (!address || !/^0x[a-fA-F0-9]{40}$/.test(address)) {
+      toast.error("Please enter a valid Ethereum address");
+      return;
+    }
+
     setAnalyzing(true);
-    // Simulate analysis
-    setTimeout(() => setAnalyzing(false), 2000);
+    setHasAnalyzed(false);
+
+    try {
+      await analyzeToken(address);
+      setHasAnalyzed(true);
+      toast.success("Token analysis complete");
+    } catch (error) {
+      toast.error("Failed to analyze token. Please try again.");
+    } finally {
+      setAnalyzing(false);
+    }
   };
 
   return (
@@ -55,7 +73,7 @@ export default function TokenAnalyzer() {
         </div>
       )}
 
-      {!analyzing && address && (
+      {!analyzing && hasAnalyzed && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="shadow-card bg-gradient-card border-border">
             <CardHeader>

@@ -1,7 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, CheckCircle, AlertCircle } from "lucide-react";
+import { TrendingUp, CheckCircle, AlertCircle, Wallet } from "lucide-react";
+import { useWallet } from "@/contexts/WalletContext";
+import { useBlockchainData } from "@/hooks/useBlockchainData";
+import { useAppKit } from "@reown/appkit/react";
 
 const mockPositions = [
   {
@@ -27,6 +30,36 @@ const mockPositions = [
 ];
 
 export default function Positions() {
+  const { isConnected } = useWallet();
+  const { positions, loading } = useBlockchainData();
+  const { open } = useAppKit();
+
+  const displayPositions = isConnected && positions.length > 0 ? positions : mockPositions;
+
+  if (!isConnected) {
+    return (
+      <div className="container mx-auto p-6">
+        <Card className="shadow-card bg-gradient-card border-border">
+          <CardContent className="flex flex-col items-center justify-center py-16 space-y-4">
+            <Wallet className="h-16 w-16 text-muted-foreground" />
+            <h2 className="text-2xl font-bold">Connect Your Wallet</h2>
+            <p className="text-muted-foreground text-center max-w-md">
+              Connect your wallet to view your DeFi positions and monitor liquidation risks.
+            </p>
+            <Button 
+              onClick={() => open()}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground mt-4"
+              size="lg"
+            >
+              <Wallet className="h-5 w-5 mr-2" />
+              Connect Wallet
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div>
@@ -36,8 +69,15 @@ export default function Positions() {
         </p>
       </div>
 
+      {loading && (
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+          <p className="mt-4 text-muted-foreground">Loading positions...</p>
+        </div>
+      )}
+
       <div className="space-y-4">
-        {mockPositions.map((position, index) => (
+        {displayPositions.map((position, index) => (
           <Card key={index} className="shadow-card bg-gradient-card border-border">
             <CardHeader>
               <div className="flex items-center justify-between">
