@@ -59,7 +59,7 @@ Make sure you have Node.js and npm installed on your machine.
 4.  **Run the development server:**
     ```sh
     npm run dev
-    ```    Open [http://localhost:8080](http://localhost:8080) to view it in your browser.
+    ```  
 
 ## Application Pages
 
