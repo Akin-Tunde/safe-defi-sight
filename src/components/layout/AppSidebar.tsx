@@ -1,3 +1,4 @@
+// FILE: src/components/layout/AppSidebar.tsx
 import { NavLink } from "react-router-dom";
 import { 
   LayoutDashboard, 
@@ -33,7 +34,8 @@ const settingsItems = [
 
 export function AppSidebar() {
   return (
-    <Sidebar className="border-r border-sidebar-border">
+    // *** FIX APPLIED HERE: Explicitly setting collapsible="icon" to enable icon-only collapse mode on desktop ***
+    <Sidebar collapsible="icon" className="border-r border-sidebar-border">
       <SidebarContent>
         <div className="flex items-center gap-2 px-6 py-4 border-b border-sidebar-border">
           <ShieldAlert className="h-6 w-6 text-primary" />
