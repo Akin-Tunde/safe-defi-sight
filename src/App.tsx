@@ -1,3 +1,4 @@
+// FILE: src/App.tsx
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -46,7 +47,7 @@ const App = () => (
                   <div className="flex-1 flex flex-col">
                     <Header />
                     {/* 2. ADD PADDING TO THE BOTTOM OF THE MAIN CONTENT */}
-                    <main className="flex-1 pb-20 md:pb-0"> 
+                    <main className="flex-1 pb-16 md:pb-0"> 
                       <Routes>
                         <Route path="/" element={<Dashboard />} />
                         <Route path="/positions" element={<Positions />} />
