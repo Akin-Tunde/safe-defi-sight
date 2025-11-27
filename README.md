@@ -52,10 +52,7 @@ Make sure you have Node.js and npm installed on your machine.
     You will need to add the following keys:
     -   `VITE_REOWN_PROJECT_ID`: Your Project ID from [WalletConnect Cloud](https://cloud.walletconnect.com/).
     -   `VITE_ETHERSCAN_API_KEY`: Your API key from [Etherscan](https://etherscan.io/apis) (Optional, for enhanced on-chain data).
-4.  **Run the development server:**
-    ```sh
-    npm run dev
-    ```  
+
 ## Application Pages
 
 -   **/ (Dashboard)**: The main overview page showing the portfolio risk score, liquidation watch, high-risk tokens, and vulnerable contracts.
