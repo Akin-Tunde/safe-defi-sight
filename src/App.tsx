@@ -1,6 +1,6 @@
 // FILE: src/App.tsx
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+// Removed import for old toaster
+import { Toaster } from "@/components/ui/sonner"; // Renaming the imported Sonner to Toaster
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -38,8 +38,8 @@ const App = () => (
         
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <TooltipProvider>
-            <Toaster />
-            <Sonner />
+            {/* Removed the old <Toaster /> component, consolidating to use Sonner only */}
+            <Toaster /> 
             <BrowserRouter>
               <SidebarProvider>
                 <div className="flex min-h-screen w-full">

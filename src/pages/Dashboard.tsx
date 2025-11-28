@@ -1,3 +1,4 @@
+// FILE: src/pages/Dashboard.tsx
 import { RiskScoreCard } from "@/components/dashboard/RiskScoreCard";
 import { LiquidationWatchCard } from "@/components/dashboard/LiquidationWatchCard";
 import { HighRiskTokensCard } from "@/components/dashboard/HighRiskTokensCard";
@@ -5,14 +6,43 @@ import { VulnerableContractsCard } from "@/components/dashboard/VulnerableContra
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWallet } from "@/contexts/WalletContext";
-import { usePositions } from "@/hooks/useBlockchainData";
+import { usePositions, Position } from "@/hooks/useBlockchainData"; 
 import { Wallet, AlertCircle } from "lucide-react";
 import { useAppKit } from "@reown/appkit/react";
 
+// Helper function to calculate an overall risk score/health factor
+const calculateOverallMetrics = (positions: Position[]) => {
+  if (!positions.length) return { riskScore: 85, overallHealthFactor: 2.0 }; // Default to a safe score
+
+  // Calculate average health factor
+  const totalHealthFactor = positions.reduce((sum, p) => sum + (p.healthFactor || 0), 0);
+  const overallHealthFactor = totalHealthFactor / positions.length;
+
+  // Simple risk score based on the lowest security score found
+  const lowestSecurityScore = positions.reduce((min, p) => Math.min(min, p.securityScore), 100);
+  
+  // Example complex risk calculation:
+  // 50% from lowest security score, 50% from health factor (scaled 1.0=0, 2.0=100)
+  // Max score is 100, Min is 0.
+  // Health factor score: Max(0, HF - 1) * 100. Capped at 100.
+  const healthFactorScore = Math.min(Math.max((overallHealthFactor - 1) * 100, 0), 100);
+  const riskScore = Math.round((lowestSecurityScore * 0.5) + (healthFactorScore * 0.5));
+
+  return { 
+    riskScore: Math.min(Math.max(riskScore, 1), 99), // Keep it between 1 and 99
+    overallHealthFactor
+  };
+}
+
 export default function Dashboard() {
   const { isConnected } = useWallet();
-  const { isLoading, isError, error } = usePositions();
+  // Fetch positions and destructure loading/error states
+  const { data: positions = [], isLoading, isError, error } = usePositions();
   const { open } = useAppKit();
+  
+  // Calculate metrics
+  const { riskScore, overallHealthFactor } = calculateOverallMetrics(positions);
+
 
   if (!isConnected) {
     return (
@@ -51,7 +81,8 @@ export default function Dashboard() {
         <Card className="border-danger/50 bg-danger/10">
           <CardContent className="flex items-center gap-3 py-4">
             <AlertCircle className="h-5 w-5 text-danger" />
-            <p className="text-sm text-danger">{error.message}</p>
+            {/* Displaying actual error message */}
+            <p className="text-sm text-danger">{error.message || "An unknown error occurred while fetching data."}</p>
           </CardContent>
         </Card>
       )}
@@ -63,9 +94,10 @@ export default function Dashboard() {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <RiskScoreCard />
-          <LiquidationWatchCard />
-          <HighRiskTokensCard />
+          {/* Pass data as props */}
+          <RiskScoreCard score={riskScore} />
+          <LiquidationWatchCard overallHealthFactor={overallHealthFactor} atRiskPositions={positions} />
+          <HighRiskTokensCard /> 
           <VulnerableContractsCard />
         </div>
       )}
