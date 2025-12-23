@@ -1,3 +1,4 @@
+// FILE: src/pages/ContractScanner.tsx
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,10 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { FileCode, Shield, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import { scanContract, ContractScanResult } from "@/hooks/useBlockchainData";
 import { toast } from "sonner";
+import { useAnalysisInput } from "@/hooks/useAnalysisInput"; // <-- NEW IMPORT
 
 export default function ContractScanner() {
-  const [address, setAddress] = useState("");
-
+  
   const { mutate, data: scanResult, isPending: scanning } = useMutation({
     mutationFn: scanContract,
     onSuccess: () => {
@@ -21,13 +22,12 @@ export default function ContractScanner() {
     }
   });
 
-  const handleScan = () => {
-    if (!address || !/^0x[a-fA-F0-9]{40}$/.test(address)) {
-      toast.error("Please enter a valid contract address");
-      return;
-    }
-    mutate(address);
-  };
+  // Use the new centralized hook
+  const { address, setAddress, handleAnalyze: handleScan, isDisabled } = useAnalysisInput(
+    mutate,
+    scanning,
+    'contract'
+  );
   
   const getSeverityBadge = (level: 'Critical' | 'Medium' | 'Low') => {
     if (level === "Critical") return <Badge className="bg-danger/20 text-danger border-danger/50">Critical</Badge>;
@@ -58,7 +58,7 @@ export default function ContractScanner() {
             />
             <Button
               onClick={handleScan}
-              disabled={!address || scanning}
+              disabled={isDisabled}
               className="bg-primary hover:bg-primary/90"
             >
               <FileCode className="h-4 w-4 mr-2" />
